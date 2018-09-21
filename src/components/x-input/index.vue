@@ -531,7 +531,6 @@ export default {
         }
         this.validateEqual()
       } else {
-        this.validate()
       }
     },
     currentValue (newVal, oldVal) {
@@ -544,7 +543,6 @@ export default {
         }
         this.validateEqual()
       } else {
-        this.validate()
       }
 
       let selection = this.$refs.input.selectionStart
