@@ -15,8 +15,7 @@ const TEMPLATE = `
   <div class="scroller-content" data-role="content"></div>
 </div>
 `
-
-const Animate = require('./animate')
+import Animate from './animate'
 const { getElement, getComputedStyle, easeOutCubic, easeInOutCubic } = require('./util')
 const passiveSupported = require('../../libs/passive_supported')
 
