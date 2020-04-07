@@ -276,15 +276,16 @@ export default {
   },
   computed: {
     labelStyles () {
+      const {$parent = {}} = this
       return {
-        width: this.labelWidthComputed || this.$parent.labelWidth || this.labelWidthComputed,
-        textAlign: this.$parent.labelAlign,
-        marginRight: this.$parent.labelMarginRight
+        width: this.labelWidthComputed || $parent.labelWidth || this.labelWidthComputed,
+        textAlign: $parent.labelAlign,
+        marginRight: $parent.labelMarginRight
       }
     },
     labelClass () {
       return {
-        'vux-cell-justify': this.$parent.labelAlign === 'justify' || this.$parent.$parent.labelAlign === 'justify'
+        'vux-cell-justify': this.$parent && (this.$parent.labelAlign === 'justify' || this.$parent.$parent.labelAlign === 'justify')
       }
     },
     pattern () {
@@ -351,7 +352,11 @@ export default {
       this.$emit('on-click-clear-icon')
     },
     focus () {
+      // this.$refs.input.focus()
+      // 优化添加
+      setTimeout(() => {
       this.$refs.input.focus()
+      }, 0)
     },
     blur () {
       this.$refs.input.blur()
@@ -362,20 +367,34 @@ export default {
       // this.scrollIntoView(500)
       // this.scrollIntoView(5000)
       setTimeout(() => {
-        this.$refs.input.scrollIntoViewIfNeeded(false)
+        // 因为有1秒的延迟，如果切换了页面，input已经不存在，所以加个判断
+        !this.$refs.input || this.$refs.input.scrollIntoViewIfNeeded(false)
         // this.$refs.input.scrollIntoViewIfNeeded()
       }, 1000)
       // $event.target.
     },
     onBlur ($event) {
+      // this.setTouched()
+      // this.validate()
+      // this.isFocus = false
+      // this.$emit('on-blur', this.currentValue, $event)
       this.setTouched()
       this.validate()
-      this.isFocus = false
+      // 优化添加
+      setTimeout(() => {
+        this.isFocus = false
+      }, 0)
       this.$emit('on-blur', this.currentValue, $event)
+
     },
     onKeyUp (e) {
+      // if (e.key === 'Enter') {
+      //   e.target.blur()
+      //   this.$emit('on-enter', this.currentValue, e)
+      // }
       if (e.key === 'Enter') {
         e.target.blur()
+        this.isFocus = true  //优化添加
         this.$emit('on-enter', this.currentValue, e)
       }
     },
@@ -535,6 +554,7 @@ export default {
       }
     },
     currentValue (newVal, oldVal) {
+      let selection = null
       if (!this.equalWith && newVal) {
         this.validateEqual()
       }
@@ -546,11 +566,13 @@ export default {
       } else {
         this.validate()
       }
-
-      let selection = this.$refs.input.selectionStart
-      let direction = newVal.length - oldVal.length
-      selection = this._getInputMaskSelection(selection, direction, this.maskValue(newVal))
-      this.lastDirection = direction
+      // #2960
+      try {
+        selection = this.$refs.input.selectionStart
+        let direction = newVal.length - oldVal.length
+        selection = this._getInputMaskSelection(selection, direction, this.maskValue(newVal))
+        this.lastDirection = direction
+      } catch (e) {}
       this.$emit('input', this.maskValue(newVal))
       // #2810
       this.$nextTick(() => {
