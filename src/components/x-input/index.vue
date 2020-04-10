@@ -384,6 +384,14 @@ export default {
       setTimeout(() => {
         this.isFocus = false
       }, 0)
+      setTimeout(() => {
+        if (navigator.userAgent.match(/MicroMessenger/i) == 'MicroMessenger' && /\(i[^;]+;( U;)? CPU.+Mac OS X/.test(navigator.userAgent)) {
+          // ios12
+          window.document.body.scrollTop = window.document.body.scrollHeight
+          // ios13
+          window.document.documentElement.scrollTop = window.document.body.scrollHeight
+        }
+      }, 0)
       this.$emit('on-blur', this.currentValue, $event)
 
     },
